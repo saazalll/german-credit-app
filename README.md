@@ -7,7 +7,7 @@ A web-based machine learning app built with **Streamlit** that predicts whether 
 
 ---
 
-## 🧠 About the Project
+## About the Project
 
 This app:
 - Uses **scikit-learn's RandomForestClassifier**
@@ -19,15 +19,7 @@ This app:
   - Feature importance
   - Classification report
 
-It is built to be simple, fast, and fully deployable to the cloud 🚀
+It is built to be simple, fast, and fully deployable to the cloud 
 
----
 
-## 📸 App Preview
-
-![App Screenshot](./screenshot.png) <!-- Replace with actual screenshot filename -->
-
----
-
-## 🗂️ Project Structure
 
