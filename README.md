@@ -20,6 +20,7 @@ This app:
   - Classification report
 
 It is built to be simple, fast, and fully deployable to the cloud 
-
+If link doesn't work click on this
+https://german-credit-app-dyfeqja3mgyurwggipviyz.streamlit.app/
 
 
