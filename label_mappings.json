@@ -1,0 +1,82 @@
+{
+    "status_map": {
+        "0": "No checking account",
+        "1": "< 0 DM",
+        "2": "0 <= ... < 200 DM",
+        "3": ">= 200 DM"
+    },
+    "credit_history_map": {
+        "0": "No credit",
+        "1": "All credits paid",
+        "2": "Existing credits paid",
+        "3": "Delayed payments",
+        "4": "Critical account"
+    },
+    "purpose_map": {
+        "0": "New Car",
+        "1": "Used Car",
+        "2": "Furniture",
+        "3": "Radio/TV",
+        "4": "Education",
+        "5": "Business",
+        "6": "Repairs",
+        "7": "Vacation",
+        "8": "Domestic Appliance",
+        "9": "Other"
+    },
+    "savings_map": {
+        "0": "No savings",
+        "1": "< 500 DM",
+        "2": "500-1000 DM",
+        "3": ">= 1000 DM",
+        "4": "Unknown"
+    },
+    "employment_map": {
+        "0": "Unemployed",
+        "1": "< 1 year",
+        "2": "1-4 years",
+        "3": "4-7 years",
+        "4": "> 7 years"
+    },
+    "personal_status_map": {
+        "0": "Male single",
+        "1": "Male married",
+        "2": "Male divorced",
+        "3": "Female divorced/married"
+    },
+    "other_debtors_map": {
+        "0": "None",
+        "1": "Co-applicant",
+        "2": "Guarantor"
+    },
+    "property_map": {
+        "0": "Real estate",
+        "1": "Savings insurance",
+        "2": "Car",
+        "3": "Other"
+    },
+    "installment_plan_map": {
+        "0": "Bank",
+        "1": "Stores",
+        "2": "None"
+    },
+    "housing_map": {
+        "0": "Own",
+        "1": "Rent",
+        "2": "Free"
+    },
+    "job_map": {
+        "0": "Unskilled",
+        "1": "Skilled",
+        "2": "Management/Self-employed",
+        "3": "Unemployed/Unknown"
+    },
+    "telephone_map": {
+        "0": "No",
+        "1": "Yes"
+    },
+    "foreign_worker_map": {
+        "0": "No",
+        "1": "Yes"
+    }
+}
