@@ -9,18 +9,27 @@ Original file is located at
 
 #!pip install streamlit
 
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
+import json
 
 st.set_page_config(page_title="Credit Risk Prediction", layout="wide")
 st.title("💳 German Credit Risk Classifier")
+
+# Load label mappings
+with open("label_mappings.json", "r") as f:
+    label_maps = json.load(f)
+
+def reverse_lookup(mapping, label):
+    return int([k for k, v in mapping.items() if v == label][0])
 
 # Load dataset
 @st.cache_data
@@ -33,13 +42,11 @@ def load_data():
     ]
     df = pd.read_csv("german.data", sep='\s+', header=None, names=columns)
     df['Target'] = df['Target'].replace({1: 1, 2: 0})
-
     le = LabelEncoder()
     for col in df.select_dtypes(include=['object']).columns:
         df[col] = le.fit_transform(df[col])
     return df
 
-# Load and prepare model
 df = load_data()
 X = df.drop('Target', axis=1)
 y = df['Target']
@@ -49,61 +56,60 @@ X_train, X_test, y_train, y_test = train_test_split(
 rf = RandomForestClassifier(n_estimators=100, random_state=42)
 rf.fit(X_train, y_train)
 
-# Sidebar form for prediction input
+# Sidebar user input
 st.sidebar.header("📋 Enter Applicant Information")
 
 def user_input_features():
     data = {
-        "Status": st.sidebar.selectbox("Status", options=sorted(df["Status"].unique())),
+        "Status": reverse_lookup(label_maps["status_map"], st.sidebar.selectbox("Status", list(label_maps["status_map"].values()))),
         "Duration": st.sidebar.slider("Duration (months)", 4, 72, 24),
-        "CreditHistory": st.sidebar.selectbox("Credit History", sorted(df["CreditHistory"].unique())),
-        "Purpose": st.sidebar.selectbox("Purpose", sorted(df["Purpose"].unique())),
+        "CreditHistory": reverse_lookup(label_maps["credit_history_map"], st.sidebar.selectbox("Credit History", list(label_maps["credit_history_map"].values()))),
+        "Purpose": reverse_lookup(label_maps["purpose_map"], st.sidebar.selectbox("Purpose", list(label_maps["purpose_map"].values()))),
         "CreditAmount": st.sidebar.slider("Credit Amount", 250, 20000, 1000),
-        "Savings": st.sidebar.selectbox("Savings", sorted(df["Savings"].unique())),
-        "EmploymentSince": st.sidebar.selectbox("Employment Since", sorted(df["EmploymentSince"].unique())),
+        "Savings": reverse_lookup(label_maps["savings_map"], st.sidebar.selectbox("Savings", list(label_maps["savings_map"].values()))),
+        "EmploymentSince": reverse_lookup(label_maps["employment_map"], st.sidebar.selectbox("Employment Since", list(label_maps["employment_map"].values()))),
         "InstallmentRate": st.sidebar.slider("Installment Rate", 1, 4, 2),
-        "PersonalStatusSex": st.sidebar.selectbox("Personal Status/Sex", sorted(df["PersonalStatusSex"].unique())),
-        "OtherDebtors": st.sidebar.selectbox("Other Debtors", sorted(df["OtherDebtors"].unique())),
+        "PersonalStatusSex": reverse_lookup(label_maps["personal_status_map"], st.sidebar.selectbox("Personal Status/Sex", list(label_maps["personal_status_map"].values()))),
+        "OtherDebtors": reverse_lookup(label_maps["other_debtors_map"], st.sidebar.selectbox("Other Debtors", list(label_maps["other_debtors_map"].values()))),
         "ResidenceSince": st.sidebar.slider("Residence Since", 1, 4, 2),
-        "Property": st.sidebar.selectbox("Property", sorted(df["Property"].unique())),
+        "Property": reverse_lookup(label_maps["property_map"], st.sidebar.selectbox("Property", list(label_maps["property_map"].values()))),
         "Age": st.sidebar.slider("Age", 18, 75, 35),
-        "OtherInstallmentPlans": st.sidebar.selectbox("Other Installment Plans", sorted(df["OtherInstallmentPlans"].unique())),
-        "Housing": st.sidebar.selectbox("Housing", sorted(df["Housing"].unique())),
+        "OtherInstallmentPlans": reverse_lookup(label_maps["installment_plan_map"], st.sidebar.selectbox("Other Installment Plans", list(label_maps["installment_plan_map"].values()))),
+        "Housing": reverse_lookup(label_maps["housing_map"], st.sidebar.selectbox("Housing", list(label_maps["housing_map"].values()))),
         "NumberCredits": st.sidebar.slider("Number of Credits", 1, 4, 2),
-        "Job": st.sidebar.selectbox("Job", sorted(df["Job"].unique())),
+        "Job": reverse_lookup(label_maps["job_map"], st.sidebar.selectbox("Job", list(label_maps["job_map"].values()))),
         "PeopleLiable": st.sidebar.slider("People Liable", 1, 2, 1),
-        "Telephone": st.sidebar.selectbox("Telephone", sorted(df["Telephone"].unique())),
-        "ForeignWorker": st.sidebar.selectbox("Foreign Worker", sorted(df["ForeignWorker"].unique()))
+        "Telephone": reverse_lookup(label_maps["telephone_map"], st.sidebar.selectbox("Telephone", list(label_maps["telephone_map"].values()))),
+        "ForeignWorker": reverse_lookup(label_maps["foreign_worker_map"], st.sidebar.selectbox("Foreign Worker", list(label_maps["foreign_worker_map"].values())))
     }
     return pd.DataFrame(data, index=[0])
 
 input_df = user_input_features()
 
-# Prediction Section
+# Prediction
 st.subheader("🧠 Credit Risk Prediction")
 if st.sidebar.button("Predict Credit Risk"):
     prediction = rf.predict(input_df)[0]
     prediction_proba = rf.predict_proba(input_df)[0]
-
     if prediction == 1:
         st.success(f"✅ Prediction: Good Credit Risk (Confidence: {prediction_proba[1]*100:.2f}%)")
     else:
         st.error(f"❌ Prediction: Bad Credit Risk (Confidence: {prediction_proba[0]*100:.2f}%)")
 
-# Display model performance
+# Model evaluation
 st.subheader("📊 Model Evaluation on Test Data")
 y_pred = rf.predict(X_test)
 st.write("Accuracy:", accuracy_score(y_test, y_pred))
 st.text("Classification Report")
 st.text(classification_report(y_test, y_pred))
 
-# Feature Importance
+# Feature importance
 st.subheader("🔍 Feature Importance")
 importances = rf.feature_importances_
 features = X.columns
 indices = np.argsort(importances)[::-1]
-
 fig, ax = plt.subplots(figsize=(10, 5))
 sns.barplot(x=importances[indices], y=features[indices], ax=ax)
 st.pyplot(fig)
+
 
